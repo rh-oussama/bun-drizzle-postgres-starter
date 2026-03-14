@@ -8,4 +8,5 @@ app.listen(env.PORT, () => {
   console.log(`Environment: ${env.NODE_ENV}`);
   console.log(`Health check: http://localhost:${env.PORT}/api/health`);
   console.log(`Auth check: http://localhost:${env.PORT}/api/auth/ok`);
+  console.log(`API Docs: http://localhost:${env.PORT}/docs`);
 });

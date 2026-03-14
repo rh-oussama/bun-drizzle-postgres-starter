@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express";
 import { env } from "./config/env";
+import { swaggerSpec } from "./config/swagger";
 import { errorHandler } from "./middleware/error-handler";
 import authRoutes from "./features/auth/auth.routes";
 import healthRoutes from "./features/health/health.routes";
@@ -44,6 +46,13 @@ export function createApp() {
   // ── Feature routes ──
   app.use("/api/health", healthRoutes);
   app.use("/api/users", usersRoutes);
+
+  // ── API Documentation ──
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.get("/docs.json", (_req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerSpec);
+  });
 
   // ── Global error handler (must be last) ──
   app.use(errorHandler);

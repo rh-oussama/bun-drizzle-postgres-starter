@@ -2,15 +2,13 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import swaggerUi from "swagger-ui-express";
 import { env } from "./config/env";
-import { swaggerSpec } from "./config/swagger";
 import { errorHandler } from "./middleware/error-handler";
 import authRoutes from "./features/auth/auth.routes";
 import healthRoutes from "./features/health/health.routes";
 import usersRoutes from "./features/users/users.routes";
 
-export function createApp() {
+export async function createApp() {
   const app = express();
 
   // ── Auth routes MUST be mounted BEFORE express.json() ──
@@ -47,12 +45,16 @@ export function createApp() {
   app.use("/api/health", healthRoutes);
   app.use("/api/users", usersRoutes);
 
-  // ── API Documentation ──
-  app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  app.get("/docs.json", (_req, res) => {
-    res.setHeader("Content-Type", "application/json");
-    res.send(swaggerSpec);
-  });
+  // ── API Documentation (development only) ──
+  if (env.NODE_ENV !== "production") {
+    const swaggerUi = await import("swagger-ui-express");
+    const { swaggerSpec } = await import("./config/swagger");
+    app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    app.get("/docs.json", (_req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      res.send(swaggerSpec);
+    });
+  }
 
   // ── Global error handler (must be last) ──
   app.use(errorHandler);

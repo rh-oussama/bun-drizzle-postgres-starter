@@ -13,7 +13,7 @@ beforeAll(() => {
 describe("Health endpoint", () => {
   it("should return health status", async () => {
     const { createApp } = await import("../src/app");
-    const app = createApp();
+    const app = await createApp();
 
     const response = await new Promise<{ status: number; body: Record<string, unknown> }>(
       (resolve) => {

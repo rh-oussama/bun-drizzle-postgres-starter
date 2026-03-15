@@ -11,13 +11,7 @@ import usersRoutes from "./features/users/users.routes";
 export async function createApp() {
   const app = express();
 
-  // ── Auth routes MUST be mounted BEFORE express.json() ──
-  // Otherwise Better Auth API calls will hang on "pending"
-  app.use("/api/auth", authRoutes);
-
-  // ── Global middleware ──
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  // ── Security middleware (applies to ALL routes including auth) ──
   app.use(
     cors({
       origin: env.CORS_ORIGIN,
@@ -40,6 +34,14 @@ export async function createApp() {
       },
     }),
   );
+
+  // ── Auth routes MUST be mounted BEFORE express.json() ──
+  // Better Auth parses its own request bodies; express.json() interferes
+  app.use("/api/auth", authRoutes);
+
+  // ── Body parsing (after auth routes) ──
+  app.use(express.json({ limit: "10kb" }));
+  app.use(express.urlencoded({ extended: true }));
 
   // ── Feature routes ──
   app.use("/api/health", healthRoutes);

@@ -1,7 +1,7 @@
 import type { Response } from "express";
-import type { AuthenticatedRequest } from "../../middleware/auth";
-import { sendSuccess, sendError } from "../../utils/api-response";
-import * as usersService from "./users.service";
+import type { AuthenticatedRequest } from "../middleware/auth";
+import { sendSuccess, sendError } from "../utils/api-response";
+import * as usersService from "../services/users.service";
 
 export async function getMe(req: AuthenticatedRequest, res: Response) {
   const user = await usersService.findUserById(req.user.id);

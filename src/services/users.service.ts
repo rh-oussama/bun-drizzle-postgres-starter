@@ -1,6 +1,6 @@
 import { eq, count } from "drizzle-orm";
-import { db } from "../../db";
-import { user } from "../../db/schema";
+import { db } from "../db";
+import { user } from "../db/schema";
 
 export async function findUserById(id: string) {
   const result = await db

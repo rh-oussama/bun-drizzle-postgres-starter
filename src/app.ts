@@ -4,9 +4,9 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { env } from "./config/env";
 import { errorHandler } from "./middleware/error-handler";
-import authRoutes from "./features/auth/auth.routes";
-import healthRoutes from "./features/health/health.routes";
-import usersRoutes from "./features/users/users.routes";
+import authRoutes from "./routes/auth.routes";
+import healthRoutes from "./routes/health.routes";
+import usersRoutes from "./routes/users.routes";
 
 export async function createApp() {
   const app = express();
@@ -43,7 +43,7 @@ export async function createApp() {
   app.use(express.json({ limit: "10kb" }));
   app.use(express.urlencoded({ extended: true }));
 
-  // ── Feature routes ──
+  // ── Routes ──
   app.use("/api/health", healthRoutes);
   app.use("/api/users", usersRoutes);
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { client } from "../../db";
-import { sendSuccess } from "../../utils/api-response";
-import { asyncHandler } from "../../utils/async-handler";
+import { client } from "../db";
+import { sendSuccess } from "../utils/api-response";
+import { asyncHandler } from "../utils/async-handler";
 
 const router = Router();
 

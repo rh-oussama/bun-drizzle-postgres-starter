@@ -93,18 +93,19 @@ src/
 │   ├── auth.ts                 # requireAuth — session validation
 │   ├── validate.ts             # Zod request validation
 │   └── error-handler.ts        # Global error handler + error classes
-├── features/
-│   ├── auth/
-│   │   └── auth.routes.ts      # Mounts Better Auth at /api/auth/*
-│   ├── health/
-│   │   └── health.routes.ts    # GET /api/health
-│   └── users/
-│       ├── users.routes.ts     # Route definitions
-│       ├── users.controller.ts # Request handlers
-│       ├── users.service.ts    # Business logic & DB queries
-│       └── users.schema.ts     # Zod validation schemas
+├── routes/
+│   ├── auth.routes.ts          # Mounts Better Auth at /api/auth/*
+│   ├── health.routes.ts        # GET /api/health
+│   └── users.routes.ts         # User route definitions
+├── controllers/
+│   └── users.controller.ts     # Request handlers
+├── services/
+│   └── users.service.ts        # Business logic & DB queries
+├── schemas/
+│   └── users.schema.ts         # Zod validation schemas
 └── utils/
-    └── api-response.ts         # Standardized JSON response helpers
+    ├── api-response.ts         # Standardized JSON response helpers
+    └── async-handler.ts        # Async error wrapper for Express 4
 ```
 
 ## Scripts
@@ -143,14 +144,13 @@ openssl rand -base64 32
 
 ## Adding a New Feature
 
-1. Create `src/features/<name>/` with:
-   - `<name>.routes.ts` — Express Router
-   - `<name>.controller.ts` — Request handlers
-   - `<name>.service.ts` — Business logic
-   - `<name>.schema.ts` — Zod schemas
-2. Register the router in `src/app.ts`
-3. Add Swagger JSDoc annotations to routes
-4. Write tests in `tests/<name>.test.ts`
+1. Add route file: `src/routes/<name>.routes.ts`
+2. Add controller: `src/controllers/<name>.controller.ts`
+3. Add service: `src/services/<name>.service.ts`
+4. Add validation schemas: `src/schemas/<name>.schema.ts`
+5. Register the router in `src/app.ts`
+6. Add OpenAPI spec entries in `src/config/swagger.ts`
+7. Write tests in `tests/<name>.test.ts`
 
 ## Database Migrations
 

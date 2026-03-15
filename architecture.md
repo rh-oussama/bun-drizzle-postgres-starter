@@ -19,7 +19,7 @@ A reusable starter kit for building Express.js APIs with authentication, designe
 | Authentication   | Better Auth (email/password + username plugin)  |
 | Validation       | Zod                                             |
 | Security         | Helmet, CORS, express-rate-limit                |
-| API Docs         | swagger-jsdoc + swagger-ui-express              |
+| API Docs         | swagger-ui-express (plain object spec)          |
 | Testing          | bun test (built-in, Jest-compatible)            |
 | Linting          | ESLint + Prettier                               |
 | CI/CD            | GitHub Actions                                  |
@@ -64,21 +64,23 @@ A reusable starter kit for building Express.js APIs with authentication, designe
 │   │   ├── validate.ts             # Zod request validation middleware
 │   │   └── error-handler.ts        # Global error handler
 │   │
-│   ├── features/
-│   │   ├── auth/
-│   │   │   └── auth.routes.ts      # Mounts Better Auth at /api/auth/*
-│   │   │
-│   │   ├── users/
-│   │   │   ├── users.routes.ts     # User CRUD route definitions
-│   │   │   ├── users.controller.ts # Request handlers
-│   │   │   ├── users.service.ts    # Business logic & DB queries
-│   │   │   └── users.schema.ts     # Zod schemas for request/response
-│   │   │
-│   │   └── health/
-│   │       └── health.routes.ts    # GET /api/health
+│   ├── routes/
+│   │   ├── auth.routes.ts          # Mounts Better Auth at /api/auth/*
+│   │   ├── health.routes.ts        # GET /api/health
+│   │   └── users.routes.ts         # User CRUD route definitions
+│   │
+│   ├── controllers/
+│   │   └── users.controller.ts     # Request handlers
+│   │
+│   ├── services/
+│   │   └── users.service.ts        # Business logic & DB queries
+│   │
+│   ├── schemas/
+│   │   └── users.schema.ts         # Zod schemas for request/response
 │   │
 │   └── utils/
-│       └── api-response.ts         # Standardized JSON response helpers
+│       ├── api-response.ts         # Standardized JSON response helpers
+│       └── async-handler.ts        # Async error wrapper for Express 4
 │
 └── tests/
     ├── setup.test.ts               # Sanity check test
@@ -89,19 +91,19 @@ A reusable starter kit for building Express.js APIs with authentication, designe
 
 ## Architecture Decisions
 
-### 1. Feature-Based Module Structure
+### 1. Traditional Express Structure (Group by Type)
 
-Each feature is a self-contained folder under `src/features/` with its own routes, controller, service, and validation schemas.
+Code is organized by layer — routes, controllers, services, and schemas each have their own directory:
 
 ```
-features/users/
-├── users.routes.ts       # Route definitions (Express Router)
-├── users.controller.ts   # HTTP layer — parses request, calls service, sends response
-├── users.service.ts      # Business logic — interacts with DB via Drizzle
-└── users.schema.ts       # Zod schemas for validation
+src/
+├── routes/               # Route definitions (Express Routers)
+├── controllers/          # HTTP layer — parse request, call service, send response
+├── services/             # Business logic — interact with DB via Drizzle
+└── schemas/              # Zod schemas for request validation
 ```
 
-**Convention:** Adding a new feature means creating a new folder under `features/` and registering its router in `app.ts`.
+**Convention:** Adding a new feature means adding files to each layer directory and registering the router in `app.ts`.
 
 ### 2. Better Auth Integration
 
@@ -129,12 +131,12 @@ Better Auth handles all authentication logic (signup, login, session management,
 ### 3. Middleware Stack (Order Matters)
 
 ```
-1. Better Auth handler    → /api/auth/* (before express.json)
-2. express.json()         → Parse JSON bodies
-3. Helmet                 → Security headers
-4. CORS                   → Cross-origin config
-5. Rate limiter           → Request throttling
-6. Feature routes         → /api/users, /api/health, etc.
+1. Helmet                 → Security headers
+2. CORS                   → Cross-origin config
+3. Rate limiter           → Request throttling
+4. Better Auth handler    → /api/auth/* (before express.json)
+5. express.json()         → Parse JSON bodies
+6. Application routes     → /api/users, /api/health, etc.
 7. Swagger UI             → /docs
 8. Global error handler   → Catches all unhandled errors
 ```
@@ -234,7 +236,7 @@ All endpoints return a consistent JSON shape:
 
 ### 11. API Documentation
 
-Swagger UI served at `/docs`, raw spec at `/docs.json`, auto-generated from JSDoc annotations on routes.
+Swagger UI served at `/docs`, raw spec at `/docs.json`. OpenAPI spec is defined as a plain object in `src/config/swagger.ts`. Only loaded in non-production environments via dynamic import.
 
 ---
 
@@ -289,12 +291,10 @@ bun run dev
 
 ## Adding a New Feature
 
-1. Create a new folder: `src/features/<feature-name>/`
-2. Add files following the convention:
-   - `<name>.routes.ts` — define routes with Express Router
-   - `<name>.controller.ts` — request handlers
-   - `<name>.service.ts` — business logic
-   - `<name>.schema.ts` — Zod validation schemas
-3. Register the router in `src/app.ts`
-4. Add Swagger JSDoc annotations to routes
-5. Write tests in `tests/<name>.test.ts`
+1. Add route file: `src/routes/<name>.routes.ts`
+2. Add controller: `src/controllers/<name>.controller.ts`
+3. Add service: `src/services/<name>.service.ts`
+4. Add validation schemas: `src/schemas/<name>.schema.ts`
+5. Register the router in `src/app.ts`
+6. Add OpenAPI spec entries in `src/config/swagger.ts`
+7. Write tests in `tests/<name>.test.ts`

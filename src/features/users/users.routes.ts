@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requireAuth, type AuthenticatedRequest } from "../../middleware/auth";
 import { validate } from "../../middleware/validate";
 import { asyncHandler } from "../../utils/async-handler";
-import { getUserByIdSchema, updateUserSchema } from "./users.schema";
+import { getUserByIdSchema, updateUserSchema, listUsersSchema } from "./users.schema";
 import * as usersController from "./users.controller";
 
 const router = Router();
@@ -17,6 +17,7 @@ router.get(
 
 router.get(
   "/",
+  validate(listUsersSchema),
   asyncHandler((req, res) => usersController.getAllUsers(req as AuthenticatedRequest, res)),
 );
 

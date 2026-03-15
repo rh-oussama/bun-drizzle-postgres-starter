@@ -113,10 +113,65 @@ export const swaggerSpec = {
     "/api/users": {
       get: {
         tags: ["Users"],
-        summary: "List all users",
+        summary: "List all users (paginated)",
         security: [{ cookieAuth: [] }],
+        parameters: [
+          {
+            in: "query",
+            name: "page",
+            schema: { type: "integer", minimum: 1, default: 1 },
+            description: "Page number",
+          },
+          {
+            in: "query",
+            name: "limit",
+            schema: { type: "integer", minimum: 1, maximum: 100, default: 20 },
+            description: "Number of items per page",
+          },
+        ],
         responses: {
-          "200": { description: "List of users" },
+          "200": {
+            description: "Paginated list of users",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: {
+                      type: "object",
+                      properties: {
+                        users: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              id: { type: "string" },
+                              name: { type: "string" },
+                              email: { type: "string" },
+                              username: { type: "string" },
+                              displayUsername: { type: "string" },
+                              image: { type: "string", nullable: true },
+                              createdAt: { type: "string", format: "date-time" },
+                            },
+                          },
+                        },
+                        pagination: {
+                          type: "object",
+                          properties: {
+                            page: { type: "integer", example: 1 },
+                            limit: { type: "integer", example: 20 },
+                            total: { type: "integer", example: 50 },
+                            totalPages: { type: "integer", example: 3 },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
           "401": { description: "Unauthorized" },
         },
       },

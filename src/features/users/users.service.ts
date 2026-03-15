@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 import { db } from "../../db";
 import { user } from "../../db/schema";
 
@@ -22,18 +22,37 @@ export async function findUserById(id: string) {
   return result[0] ?? null;
 }
 
-export async function findAllUsers() {
-  return db
-    .select({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      username: user.username,
-      displayUsername: user.displayUsername,
-      image: user.image,
-      createdAt: user.createdAt,
-    })
-    .from(user);
+export async function findAllUsers(page: number, limit: number) {
+  const offset = (page - 1) * limit;
+
+  const [users, totalResult] = await Promise.all([
+    db
+      .select({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        displayUsername: user.displayUsername,
+        image: user.image,
+        createdAt: user.createdAt,
+      })
+      .from(user)
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: count() }).from(user),
+  ]);
+
+  const total = totalResult[0]?.count ?? 0;
+
+  return {
+    users,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export async function updateUser(id: string, data: { name?: string }) {

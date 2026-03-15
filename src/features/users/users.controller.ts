@@ -24,9 +24,11 @@ export async function getUserById(req: AuthenticatedRequest, res: Response) {
   return sendSuccess(res, user);
 }
 
-export async function getAllUsers(_req: AuthenticatedRequest, res: Response) {
-  const users = await usersService.findAllUsers();
-  return sendSuccess(res, users);
+export async function getAllUsers(req: AuthenticatedRequest, res: Response) {
+  const page = Number(req.query.page);
+  const limit = Number(req.query.limit);
+  const result = await usersService.findAllUsers(page, limit);
+  return sendSuccess(res, result);
 }
 
 export async function updateUser(req: AuthenticatedRequest, res: Response) {

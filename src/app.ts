@@ -36,7 +36,6 @@ export async function createApp() {
   );
 
   // ── Auth routes MUST be mounted BEFORE express.json() ──
-  // Better Auth parses its own request bodies; express.json() interferes
   app.use("/api/auth", authRoutes);
 
   // ── Body parsing (after auth routes) ──

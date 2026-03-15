@@ -26,7 +26,7 @@ export const swaggerSpec = {
       get: {
         tags: ["Health"],
         summary: "Health check",
-        description: "Returns server health status and uptime",
+        description: "Returns server health status, uptime, and database connectivity",
         responses: {
           "200": {
             description: "Server is healthy",
@@ -42,12 +42,16 @@ export const swaggerSpec = {
                         status: { type: "string", example: "ok" },
                         uptime: { type: "number" },
                         timestamp: { type: "string", format: "date-time" },
+                        database: { type: "string", example: "ok" },
                       },
                     },
                   },
                 },
               },
             },
+          },
+          "503": {
+            description: "Server is degraded (database unreachable)",
           },
         },
       },

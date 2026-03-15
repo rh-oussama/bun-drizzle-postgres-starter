@@ -1,3 +1,5 @@
+import { env } from "./env";
+
 export const swaggerSpec = {
   openapi: "3.0.0",
   info: {
@@ -7,7 +9,7 @@ export const swaggerSpec = {
   },
   servers: [
     {
-      url: "http://localhost:3000",
+      url: env.BETTER_AUTH_URL,
       description: "Development server",
     },
   ],
